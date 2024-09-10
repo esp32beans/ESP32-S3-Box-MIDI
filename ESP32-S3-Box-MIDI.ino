@@ -27,6 +27,10 @@
  * Convert capacitive touch screen (x,y) to USB MIDI CC.
  */
 
+#define CC_Modulation (1)
+
+#define CC14_MODULATION_ENABLE (1)
+
 #if ARDUINO_USB_MODE
 #warning This sketch should be used when USB is in OTG mode
 #endif
@@ -48,6 +52,11 @@ const int SCREEN_Y_MAX = 239;
 
 static lv_obj_t * label;
 
+void CC14(uint8_t control, uint16_t cc14_value, uint8_t chan) {
+  MIDI.controlChange(CC_Modulation, (uint8_t)((cc14_value >> 7) & 0x7F), chan);
+  MIDI.controlChange(CC_Modulation+32, (uint8_t)(cc14_value & 0x7F), chan);
+}
+
 static void slider_event_cb(lv_event_t * e) {
   static int32_t pitch_last;
   int32_t pitch;
@@ -63,7 +72,11 @@ static void slider_event_cb(lv_event_t * e) {
   }
   if (pitch != pitch_last) {
     pitch_last = pitch;
+#if CC14_MODULATION_ENABLE
+    CC14(CC_Modulation, pitch, 1);
+#else
     MIDI.pitchBend((uint16_t)pitch);
+#endif
     /* Refresh the text */
     lv_label_set_text_fmt(label, "%" LV_PRId32, pitch);
     lv_obj_align_to(label, slider, LV_ALIGN_OUT_TOP_MID, 0, -15);    /*Align top of the slider*/
