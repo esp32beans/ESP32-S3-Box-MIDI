@@ -29,7 +29,7 @@
 
 #define CC_Modulation (1)
 
-#define CC14_MODULATION_ENABLE (1)
+#define CC14_MODULATION_ENABLE (0)
 
 #if ARDUINO_USB_MODE
 #warning This sketch should be used when USB is in OTG mode
